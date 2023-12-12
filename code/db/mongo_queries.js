@@ -1,5 +1,6 @@
 const { MongoClient, ObjectId } = require('mongodb');
-
+const { createClient } = require('redis');
+let redisClient = null;
 // Connection URL
 const url = 'mongodb://localhost:27017';
 
@@ -17,12 +18,48 @@ async function connectToDatabase() {
 async function createProduct(product) {
     const database = await connectToDatabase();
     const result = await database.collection('Product').insertOne(product);
+    console.log("[DB] Create result = ", result);
+
+    // Connect to Redis
+    redisClient = await createClient()
+        .on("error", (err) => console.log("Redis Client connection error " + err))
+        .connect();
+    console.log("Connected to Redis Client");
+
+    // Set the count of the product to 0
+    // Check if _id exists and is an object
+    if (result && result.insertedId && result.insertedId instanceof ObjectId) {
+        const idString = result.insertedId.toString();
+        console.log("[DB] Creating product with id = ", idString);
+        await redisClient.set(`OnRackProduct:${idString}`, 0);
+        console.log("redis set done with product_id = ", idString, " and count = ", await redisClient.get(`OnRackProduct:${idString}`));
+
+    } else {
+        console.error("[DB] Unable to retrieve product ID from the result:", result);
+    }
+
+
     return result;
 }
 
 async function readAllProducts() {
     const database = await connectToDatabase();
     const result = await database.collection('Product').find({}).toArray();
+    console.log("[DB] Reading all products result [0] = ", result[0]);
+
+    // Connect to Redis
+    redisClient = await createClient()
+        .on("error", (err) => console.log("Redis Client connection error " + err))
+        .connect();
+
+    // loop through all product and get the OnRack count
+    for (let i = 0; i < result.length; i++) {
+        const product = result[i];
+        const count = await redisClient.get(`OnRackProduct:${product._id.toString()}`);
+        product.on_rack_count = count;
+    }
+
+    console.log("[DB] Reading all products after redis result [-1] = ", result[result.length - 1]);
     return result;
 }
 
@@ -122,7 +159,10 @@ async function addRackItem(userId, newRackItem) {
         console.log("[DB] User not found for userId = ", userId);
         return null;
     }
-    
+
+    await redisClient.incr(`OnRackProduct:${newRackItem.product_id}`);
+    console.log("redis incr done with product_id = ", newRackItem.product_id, " and count = ", await redisClient.get(`OnRackProduct:${newRackItem.product_id}`));
+
     const item = { product_id: new ObjectId(newRackItem._id), purchased_date: newRackItem.purchased_date };
 
     const result = await userCollection.updateOne(
@@ -191,6 +231,9 @@ async function deleteRackItem(userId, productId) {
             }
         }
     );
+
+    await redisClient.decr(`OnRackProduct:${productId}`);
+    console.log("redis decr done with product_id = ", productId, " and count = ", await redisClient.get(`OnRackProduct:${productId}`));
 
     console.log("[DB] Deleting rack item for userId = ", userId, " productId = ", productId, " result = ", result)
     return result;

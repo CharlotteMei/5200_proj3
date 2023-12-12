@@ -50,6 +50,14 @@
                 </div>
 
                 <div>
+                    <label>It is on  <output>
+                            <%= productItem.on_rack_count ? productItem.on_rack_count : 0 %>
+                        </output>
+                        user(s)' rack right now
+                    </label>
+                </div>
+
+                <div>
                     <a type="button" class="btn btn-outline-primary btn-sm"
                         href="/products/<%= productItem._id %>/edit">Modify</a>
                     <a type="button" class="btn btn-outline-danger btn-sm"
