@@ -160,8 +160,6 @@ async function addRackItem(userId, newRackItem) {
         return null;
     }
 
-    await redisClient.incr(`OnRackProduct:${newRackItem.product_id}`);
-    console.log("redis incr done with product_id = ", newRackItem.product_id, " and count = ", await redisClient.get(`OnRackProduct:${newRackItem.product_id}`));
 
     const item = { product_id: new ObjectId(newRackItem._id), purchased_date: newRackItem.purchased_date };
 
@@ -177,6 +175,17 @@ async function addRackItem(userId, newRackItem) {
     );
 
     console.log("[DB] Adding rack item for userId = ", userId, " new rack item = ", item, " result = ", result)
+
+    // Connect to Redis
+    redisClient = await createClient()
+        .on("error", (err) => console.log("Redis Client connection error " + err))
+        .connect();
+
+    // increment the count of the product
+    const idString = item.product_id.toString();
+    await redisClient.incr(`OnRackProduct:${idString}`);
+    console.log("redis incr done with product_id = ", idString, " and count = ", await redisClient.get(`OnRackProduct:${idString}`));
+
     return result;
 }
 
@@ -232,10 +241,19 @@ async function deleteRackItem(userId, productId) {
         }
     );
 
-    await redisClient.decr(`OnRackProduct:${productId}`);
-    console.log("redis decr done with product_id = ", productId, " and count = ", await redisClient.get(`OnRackProduct:${productId}`));
-
     console.log("[DB] Deleting rack item for userId = ", userId, " productId = ", productId, " result = ", result)
+
+
+    // Connect to Redis
+    redisClient = await createClient()
+        .on("error", (err) => console.log("Redis Client connection error " + err))
+        .connect();
+
+    // decrease the count of the product
+    const idString = productId;
+    await redisClient.decr(`OnRackProduct:${idString}`);
+    console.log("redis decr done with product_id = ", idString, " and count = ", await redisClient.get(`OnRackProduct:${idString}`));
+    
     return result;
 
 }
