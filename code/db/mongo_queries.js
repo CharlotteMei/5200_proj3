@@ -44,9 +44,8 @@ async function createProduct(product) {
 
 async function readAllProducts() {
     const database = await connectToDatabase();
-    const result = await database.collection('Product').find({}).toArray();
-    console.log("[DB] Reading all products result [0] = ", result[0]);
-
+    const result = await database.collection('Product').find({}).sort({ _id: -1 }).toArray();
+    
     // Connect to Redis
     redisClient = await createClient()
         .on("error", (err) => console.log("Redis Client connection error " + err))
@@ -59,7 +58,7 @@ async function readAllProducts() {
         product.on_rack_count = count;
     }
 
-    console.log("[DB] Reading all products after redis result [-1] = ", result[result.length - 1]);
+    console.log("[DB] Reading all products after redis result [0] = ", result[0]);
     return result;
 }
 
