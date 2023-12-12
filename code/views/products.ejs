@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<!-- show all products -->
+<head>
+  <title>SkinCare Rack App</title>
+  <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  <%- include('./partials/css.ejs') %>
+</head>
+
+<body>
+  <h1>All Products</h1>
+  <p>See all products here</p>
+  <button onclick="window.location.href='/'"> Home!!</button>
+  <button onclick="window.location.href='/products/add'"> Add Product</button>
+
+  <!-- display all products -->
+
+  <% products.forEach(function(productItem) { %>
+    <div class="col-4 mb-2">
+        <div class="card p-2">
+            <div class="card-title">
+                <label><output>
+                        <%= productItem.name %>
+                    </output></label>
+            </div>
+            <div class="card-text">
+                <!-- <div>
+                    <label>Product id: <output>
+                            <%= productItem.product_id %>
+                        </output>
+                    </label>
+                </div> -->
+                <div>
+                    <label>Type: <output>
+                            <%= productItem.type %>
+                        </output>
+                    </label>
+                </div>
+                <div>
+                    <label>Price ($): <output>
+                            <%= productItem.price_in_usd %>
+                        </output>
+                    </label>
+                </div>
+                <div>
+                    <label>Size (g): <output>
+                            <%= productItem.size_in_grams %>
+                        </output>
+                    </label>
+                </div>
+
+                <div>
+                    <a type="button" class="btn btn-outline-primary btn-sm"
+                        href="/products/<%= productItem._id %>/edit">Modify</a>
+                    <a type="button" class="btn btn-outline-danger btn-sm"
+                        href="/products/<%= productItem._id %>/delete">Remove This Item</a>
+                </div>
+            </div>
+            <!-- /.card-text -->
+        </div>
+        <!-- /.card -->
+    </div>
+
+    <% }); %>
+
+</body>
+
+</html>
+
+</body>
+
+</html>

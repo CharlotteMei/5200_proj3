@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Product Edit
+    </title>
+    <%- include('./partials/css.ejs') %>
+
+<body>
+    <h1>
+        Product Edit
+    </h1>
+    <a href="/products">
+        <button>See All Products</button></a>
+    <p>Change the product details and click save to modify product to the database.
+    </p>
+
+    <form action="/products/<%=product?._id%>/edit" method="POST">
+        <div class="mb-3">
+            <label class="form-label">
+                Product Name
+                <input type="text" name="name" class="form-control" value="<%= product.name%>"/>
+            </label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">
+                Type (e.g. lotion, cream, etc.)
+                <input type="text" name="type" class="form-control" value="<%= product.type%>"/>
+            </label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">
+                Price ($)
+                <input type="text" name="price_in_usd" class="form-control" value="<%= product.price_in_usd%>" />
+            </label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">
+                Size (g)
+                <input type="text" name="size_in_grams" class="form-control" value="<%= product.size_in_grams%>" />
+            </label>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+
+
+
+    <footer>Made by Yufei (Charlotte) Mei</footer>
+</body>
+
+</html>

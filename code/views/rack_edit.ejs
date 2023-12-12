@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<!-- show all products -->
+<head>
+  <title>SkinCare Rack App</title>
+  <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  <%- include('./partials/css.ejs') %>
+</head>
+
+<body>
+  <h1>My Rack</h1>
+  <p>Add Item to My Rack</p>
+  <!-- <button onclick="window.location.href='/'"> Home!!</button> -->
+  <button onclick="window.location.href='/<%= userId%>/rack/'"> Back to My Rack</button>
+  
+  <form action="/<%= userId%>/rack/<%= productId%>/edit" method="POST">
+
+    <div class="mb-3">
+        <label class="form-label">
+            Product
+            <select name="_id" class="form-select">
+                <option value="<%= item._id %>"><%= item.name %></option>
+            </select>
+        </label>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">
+            Date
+            <input type="date" name="purchased_date" class="form-control" />
+        </label>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
